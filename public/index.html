@@ -1,0 +1,149 @@
+
+<!doctype html>
+
+<!-- ASSIGN OUR ANGULAR MODULE -->
+<html ng-app="WildGeekUsers">
+<head>
+	<!-- META -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"><!-- Optimize mobile viewport -->
+
+	<title>WildGeek</title>
+
+	<!-- SCROLLS -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"><!-- load bootstrap -->
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<style>
+		html                    { overflow-y:scroll; }
+		body                    { padding-top:50px; }
+		#todo-list              { margin-bottom:30px; }
+	</style>
+
+	<!-- SPELLS -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+	<script src="core.js"></script>
+
+</head>
+<!-- SET THE CONTROLLER AND GET ALL USERS -->
+<body ng-controller="usersController">
+	<div class="container">
+
+		<!-- HEADER AND USERS COUNT -->
+		<div ng-click="returntoUsers()" class="jumbotron text-center">
+			<h1>WildGeek users <span class="label label-info">{{ users.length }}</span></h1>
+		</div>
+		<!-- ALL USERS -->
+		<div ng-show="view=='users'">
+			<!-- USER LIST -->
+			<h3>Users:</h3>
+			<div id="user-list" class="row">
+				<div class="col-sm-4 col-sm-offset-4">
+
+					<!-- LOOP OVER THE USERS IN $scope.users -->
+					<div class="checkbox" ng-repeat="user in users">
+						<div ng-click="goToUser(user.name)">{{user.name}}</div>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- FORM TO CREATE USERS -->
+			<h3>New user:</h3>
+			<div id="user-form" class="row">
+				<div class="col-sm-8 col-sm-offset-2 text-center">
+					<form>
+						<div class="form-group">
+							<input type="text" class="form-control input-lg text-center" placeholder="Name" ng-model="formData.name">
+							<input type="password" class="form-control input-lg text-center" placeholder="Password" ng-model="formData.password">
+						</div>
+						<button type="submit" class="btn btn-primary btn-lg" ng-click="createUser()">Add</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!-- ONE USER -->
+		<div ng-show="view!='users'">
+			<!-- USER EDIT -->
+			<div ng-show="view.edit">
+				<div id="user-edit">
+					<h1>{{view.name}}</h1>
+					<h4>About</h3>
+					<input type="text" class="form-control input-lg text-center" placeholder="Talk about you" ng-model="formData.editAbout">
+					<h4>Projects</h4>
+					<div ng-repeat="project in formData.editProjects">
+						<div class="Container">
+							<input type="text" class="form-control input-lg text-center" placeholder="Project title" ng-model="project.title">
+							<input type="text" class="form-control input-lg text-center" placeholder="Project description" ng-model="project.body">
+							<button type="submit" class="btn btn-primary btn-lg" ng-click="deleteProject($index)">Delete project</button>
+						</div>
+					</div>
+					<button type="submit" class="btn btn-primary btn-lg" ng-click="newProject()">New project</button>
+					<div>
+						<button type="submit" class="btn btn-primary btn-lg" ng-click="save()">Save</button>
+						<button type="submit" class="btn btn-primary btn-lg" ng-click="goToUser(view.name)">Discard</button>
+					</div>
+				</div>
+			</div>
+			<!-- USER SHOW -->
+			<div ng-show="!view.edit">
+				<!-- USER INFO -->
+				<div id="user-info">
+					<h1>{{view.name}}</h1>
+					<div>About</h3>
+					<div ng-show="view.about==''">Nothing yet :(</div>
+					<div ng-show="view.about!=''">{{view.about}}</div>
+					<h3>Projects</h3>
+					<div ng-show="view.projects.length==0">Nothing yet :(</div>
+					<div ng-show="view.projects.length>0">
+						<div ng-repeat="project in view.projects"  class="Container">
+							<div class="Container">
+								<h4>{{project.title}}</h4>
+								<div>{{project.body}}</div>
+							</div>
+						</div>
+					</div>
+					<h3>Comments</h3>
+					<div ng-show="view.comments.length==0">Nothing yet :(</div>
+					<div ng-show="view.comments.length>0">
+						<div ng-repeat="comment in view.comments">
+							<div class="Container">
+								<h4>{{comment.user}}</h4>
+								<div>{{comment.body}}</div>
+							</div>
+						</div>
+					</div>
+					<!-- FORM TO CREATE COMMENTS -->
+					<h3>Create a comment for this user:</h3>
+					<div id="comment-form" class="row">
+						<div class="col-sm-8 col-sm-offset-2 text-center">
+							<form>
+								<div class="form-group">
+									<input type="text" class="form-control input-lg text-center" placeholder="Name" ng-model="formData.commentUser">
+									<input type="password" class="form-control input-lg text-center" placeholder="Password" ng-model="formData.commentPassword">
+									<input type="text" class="form-control input-lg text-center" placeholder="Add a comment" ng-model="formData.comment">
+								</div>
+								<button type="submit" class="btn btn-primary btn-lg" ng-click="addComment()">Comment</button>
+							</form>
+						</div>
+					</div>
+				</div>
+				<h3>If you are this user write your password to delete or edit your account</h3>
+				<!-- FORM TO DELETE USERS AND EDIT CONTENT -->
+				<div id="user-delete" class="row">
+					<div class="col-sm-8 col-sm-offset-2 text-center">
+						<form>
+							<div class="form-group">
+								<input type="password" class="form-control input-lg text-center" placeholder="Password" ng-model="formData.deletePassword">
+							</div>
+							<button type="submit" class="btn btn-primary btn-lg" ng-click="goToEditMode()">Edit</button>
+							<button type="submit" class="btn btn-primary btn-lg" ng-click="deleteUser(view.name)">Delete</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name"         : "App-for-the-pigeon",
+  "version"      : "0.0.0",
+  "description"  : "Simple todo application with node.js, angular.js and mongodb.",
+  "main"         : "server.js",
+  "author"       : "Chipi",
+  "dependencies" : {
+    "express"    : "~4.7.2",
+    "mongojs"    : "~2.3.0",
+    "morgan"     : "~1.2.2",
+    "body-parser": "~1.5.2",
+    "method-override": "~2.1.2"
+    }
+}
