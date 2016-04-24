@@ -18,74 +18,37 @@ var db=mongojs("localhost",["Users"]);
 
 // routes ======================================================================
 	// api ---------------------------------------------------------------------
-	// get all users
-	app.get('/api/users', function(req, res) {
-		db.Users.find(function(err,users) {
-			if(err)
-				res.send(err);
-			res.json(users);
-		});
-	});
 	//create a comment
-	app.post('/api/comments', function(req, res){
-		db.Users.findAndModify({
-			query: {name: req.body.name},
-			update: {$set: {comments: req.body.comments}},
-		},function (err,doc){
-			if(err)
-				res.send(err);
-			db.Users.find(function(err,users){
-				if(err)
-					res.send(err);
-				res.json(users);
-			});
-		})
-	});
 	//create a user
 	app.post('/api/users', function(req, res) {
 		db.Users.save({
-			name: req.body.name,
+			name: req.body.name+req.body.second,
 			password: req.body.password,
-			projects: [],
-			about: "",
-			comments: [],
+			email: req.body.email,
+			children: [],
 		}, function(err, user) {
 			if(err)
 				res.send(err);
-			db.Users.find(function(err,users) {
-				if (err)
-					res.send(err)
-				res.json(users);
-			});
+			res.json(user);
 		});
 	});
 	//edit a user
 	app.post('/api/user',function(req, res){
 		db.Users.findAndModify({
-			query: {name: req.body.name},
-			update: {$set: {projects: req.body.editProjects,about: req.body.editAbout}},
-		},function (err,doc){
+			query: {email: req.body.email},
+			update: {$set: {children: req.body.children}},
+		},function (err,user){
 			if(err)
 				res.send(err);
-			db.Users.find(function(err,users){
-				if(err)
-					res.send(err);
-				res.json(users);
-			});
+			res.json(user);
 		})
 	});
-	// delete a user
-	app.delete('/api/users/:user', function(req, res) {
-		db.Users.remove({
-			name: req.params.user
-		}, function(err,user) {
-			if (err)
+	//login
+	app.get('/api/users', function(req, res) {
+		db.Users.findOne({email: req.body.email,password: req.body.password},function(err,users) {
+			if(err)
 				res.send(err);
-			db.Users.find(function(err,users){
-				if(err)
-					res.send(err)
-				res.json(users);
-			});
+			res.json(users);
 		});
 	});
 

@@ -2,22 +2,22 @@
 <!doctype html>
 
 <!-- ASSIGN OUR ANGULAR MODULE -->
-<html ng-app="WildGeekUsers">
+<html ng-app="Educahorro">
 <head>
 	<!-- META -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1"><!-- Optimize mobile viewport -->
+	<meta name="keywords" content="EDUCAFIN, Ahorro, Educación">
 
-	<title>WildGeek</title>
+	<title>Educahorro</title>
 
-	<!-- SCROLLS -->
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"><!-- load bootstrap -->
+	<!-- STYLE -->
+	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<style>
-		html                    { overflow-y:scroll; }
-		body                    { padding-top:50px; }
-		#todo-list              { margin-bottom:30px; }
-	</style>
+	<link rel="stylesheet" type="text/css" href="bigStyle.css">
+	<link rel="stylesheet" media="screen and (max-width: 1025px)" href="mediumStyle.css">
+	<link rel="stylesheet" media="screen and (max-width: 715px)" href="smallStyle.css">
 
 	<!-- SPELLS -->
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
@@ -26,124 +26,139 @@
 
 </head>
 <!-- SET THE CONTROLLER AND GET ALL USERS -->
-<body ng-controller="usersController">
-	<div class="container">
-
-		<!-- HEADER AND USERS COUNT -->
-		<div ng-click="returntoUsers()" class="jumbotron text-center">
-			<h1>WildGeek users <span class="label label-info">{{ users.length }}</span></h1>
+<body ng-controller="eduController">
+	<nav class="Toolbar">
+		<div ng-click="toggleSidebar()" class="fa fa-bars"></div>
+		<div class="Search"></div>
+		<div class="User">
+			<div id="Login" ng-click="goToView('Login')" ng-show="user==null">Iniciar sesión</div>
+			<div id="UserCircle" ng-click="goToView('Profile')" ng-hide="user==null"></div>
 		</div>
-		<!-- ALL USERS -->
-		<div ng-show="view=='users'">
-			<!-- USER LIST -->
-			<h3>Users:</h3>
-			<div id="user-list" class="row">
-				<div class="col-sm-4 col-sm-offset-4">
-
-					<!-- LOOP OVER THE USERS IN $scope.users -->
-					<div class="checkbox" ng-repeat="user in users">
-						<div ng-click="goToUser(user.name)">{{user.name}}</div>
-					</div>
-
-				</div>
-			</div>
-
-			<!-- FORM TO CREATE USERS -->
-			<h3>New user:</h3>
-			<div id="user-form" class="row">
-				<div class="col-sm-8 col-sm-offset-2 text-center">
-					<form>
-						<div class="form-group">
-							<input type="text" class="form-control input-lg text-center" placeholder="Name" ng-model="formData.name">
-							<input type="password" class="form-control input-lg text-center" placeholder="Password" ng-model="formData.password">
-						</div>
-						<button type="submit" class="btn btn-primary btn-lg" ng-click="createUser()">Add</button>
-					</form>
-				</div>
-			</div>
-		</div>
-		<!-- ONE USER -->
-		<div ng-show="view!='users'">
-			<!-- USER EDIT -->
-			<div ng-show="view.edit">
-				<div id="user-edit">
-					<h1>{{view.name}}</h1>
-					<h4>About</h3>
-					<input type="text" class="form-control input-lg text-center" placeholder="Talk about you" ng-model="formData.editAbout">
-					<h4>Projects</h4>
-					<div ng-repeat="project in formData.editProjects">
-						<div class="Container">
-							<input type="text" class="form-control input-lg text-center" placeholder="Project title" ng-model="project.title">
-							<input type="text" class="form-control input-lg text-center" placeholder="Project description" ng-model="project.body">
-							<button type="submit" class="btn btn-primary btn-lg" ng-click="deleteProject($index)">Delete project</button>
-						</div>
-					</div>
-					<button type="submit" class="btn btn-primary btn-lg" ng-click="newProject()">New project</button>
-					<div>
-						<button type="submit" class="btn btn-primary btn-lg" ng-click="save()">Save</button>
-						<button type="submit" class="btn btn-primary btn-lg" ng-click="goToUser(view.name)">Discard</button>
-					</div>
-				</div>
-			</div>
-			<!-- USER SHOW -->
-			<div ng-show="!view.edit">
-				<!-- USER INFO -->
-				<div id="user-info">
-					<h1>{{view.name}}</h1>
-					<div>About</h3>
-					<div ng-show="view.about==''">Nothing yet :(</div>
-					<div ng-show="view.about!=''">{{view.about}}</div>
-					<h3>Projects</h3>
-					<div ng-show="view.projects.length==0">Nothing yet :(</div>
-					<div ng-show="view.projects.length>0">
-						<div ng-repeat="project in view.projects"  class="Container">
-							<div class="Container">
-								<h4>{{project.title}}</h4>
-								<div>{{project.body}}</div>
-							</div>
-						</div>
-					</div>
-					<h3>Comments</h3>
-					<div ng-show="view.comments.length==0">Nothing yet :(</div>
-					<div ng-show="view.comments.length>0">
-						<div ng-repeat="comment in view.comments">
-							<div class="Container">
-								<h4>{{comment.user}}</h4>
-								<div>{{comment.body}}</div>
-							</div>
-						</div>
-					</div>
-					<!-- FORM TO CREATE COMMENTS -->
-					<h3>Create a comment for this user:</h3>
-					<div id="comment-form" class="row">
-						<div class="col-sm-8 col-sm-offset-2 text-center">
-							<form>
-								<div class="form-group">
-									<input type="text" class="form-control input-lg text-center" placeholder="Name" ng-model="formData.commentUser">
-									<input type="password" class="form-control input-lg text-center" placeholder="Password" ng-model="formData.commentPassword">
-									<input type="text" class="form-control input-lg text-center" placeholder="Add a comment" ng-model="formData.comment">
-								</div>
-								<button type="submit" class="btn btn-primary btn-lg" ng-click="addComment()">Comment</button>
-							</form>
-						</div>
-					</div>
-				</div>
-				<h3>If you are this user write your password to delete or edit your account</h3>
-				<!-- FORM TO DELETE USERS AND EDIT CONTENT -->
-				<div id="user-delete" class="row">
-					<div class="col-sm-8 col-sm-offset-2 text-center">
-						<form>
-							<div class="form-group">
-								<input type="password" class="form-control input-lg text-center" placeholder="Password" ng-model="formData.deletePassword">
-							</div>
-							<button type="submit" class="btn btn-primary btn-lg" ng-click="goToEditMode()">Edit</button>
-							<button type="submit" class="btn btn-primary btn-lg" ng-click="deleteUser(view.name)">Delete</button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>	
+	</nav>
+	<div class="Sidebar">
+		<div class="SidebarItem" ng-click="goToView('Inicio')">Inicio</div>
+		<div class="SidebarItem" ng-click="goToView('Conocenos')">Conocenos</div>
 	</div>
+	<main>
+		<!-- CONOCENOS -->
+		<div ng-show="view=='Conocenos'">
+			<center>
+				<div class="imagenprincipal">
+					<img src="gto.png">
+					<img src="logoweb.gif">
+					<img src="educafin.jpg">
+				</div>
+			</center>
+			<center>
+				<h1>ORIENTACION EDUCATIVA</h1>
+			</center><BR><BR>
+			<center>
+				<p>Educahorro es una extension de EDUCAFIN con el objetivo de ayudarte a ahorrar en una mejor educacion para tus hijos.<BR>No solo imagines un mundo mejor para ellos, crealo!<BR> </p><BR><BR><BR>
+			</center>
+			<table>
+				<TR>
+					<TD><p class="subtitle">OBJETIVO:</p></TD>
+					<TD><p title="text">Ser la mejor plataforma para el ahorro en educacion para las futuras generaciones. </p><BR></TD>
+				</TR>
+				<TR>
+					<TD><p class="subtitle">MISION:</p></TD>
+					<TD><p title="text">Comprometernos con todos aquellas personas que buscan una educacion de calidad<BR> y apoyarlos a cumplir su objetivo. </p><BR></TD></TR>
+				<TR>
+					<TD><p class="subtitle">VISION:</p></TD>
+					<TD><p title="text">Aumenta el porcentaje de los estudiantes con beca. </p><BR></TD>
+				</TR>
+			</table>
+			<center>Desde ahora con Educahorro puedes empezar a crear un monto para mejorar el futuro de la educacion de tus hijos.<BR> Aqui se muestran algunas universidades asociadas a este proyecto.</center>
+			<center>
+				<div class="imagencontexto">
+					<div class="imagendeltexto">
+						<center><A HREF="http://www.ipn.mx/Paginas/inicio.aspx">Instituto Politecnico Nacional</A></center>
+					</div>
+					<A HREF="http://www.ipn.mx/Paginas/inicio.aspx"><img src="ipn.jpg"></A>
+				</div>
+				<div class="imagencontexto">
+					<div class="imagendeltexto">
+						<center><A HREF="http://bajio.delasalle.edu.mx/">Universidad de la Salle</A></center>
+					</div>
+					<A HREF="http://bajio.delasalle.edu.mx/"><img src="lasalle.jpg"></A>
+				</div>
+				<div class="imagencontexto">
+					<div class="imagendeltexto">
+						<center><A HREF="http://www.uia.mx/">Universidad Iberoamericana</A></center>
+					</div>
+					<A HREF="http://www.uia.mx/"><img src="iberoamericana.jpg"></A>
+				</div>
+			</center>
+			<p>Top 5 mejores universidades de México</p><BR><BR>
+			<TABLE BORDER="1">
+				<TR>
+				 	<TD>Ranking    </TD> <TD>Universidad</TD><TD>Dependencia</TD><TD>Ciudad</TD><TD>Zona</TD>
+			 	</TR>
+			 	<TR>
+				 	<TD>1</TD> <TD>Universidad Nacional Autonoma de Mexico</TD><TD>Publica</TD><TD>D.F.</TD><TD>Centro</TD>
+			 	</TR>
+			 	<TR>
+				 	<TD>2</TD> <TD>Instituto Tecnologico y de Estudios Superiores de Monterrey</TD><TD>Privada</TD><TD>Monterrey  </TD><TD>Noroeste</TD>
+			 	</TR>
+			 	<TR>
+				 	<TD>3</TD> <TD>Instituto Politecnico Nacional</TD><TD>Publica</TD><TD>D.F.</TD><TD>Centro</TD>
+			 	</TR>
+			 	<TR>
+				 	<TD>4</TD> <TD>Universidad Autonoma Metropolitana</TD><TD>Publica</TD><TD>D.F.</TD><TD>Centro</TD>
+			 	</TR>
+			 	<TR>
+				 	<TD>5</TD> <TD>El colegio de Mexico</TD><TD>Publica</TD><TD>D.F.</TD><TD>Centro</TD>
+			 	</TR>
+			</TABLE>
+			<BR><BR><p>No tienes ideas de que estudiar? Apoyate con estos test vocacional para descubrir tu verdadera vocacion</p><BR>
+			<A HREF ="http://www.decidetusestudios.sep.gob.mx/vista/test-vocacional/registro.php">Test Vocacional(SEP)</A><BR>
+			<A HREF ="http://www.elegircarrera.net/Test/General.aspx">Test Vocacional</A>
+		</div>
+		<!-- LOGIN -->
+		<div ng-show="view=='Login'">
+			<center>
+				<div id="LoginContainer">
+					<h3>Acceder</h3>
+					<input type="text" placeholder="Correo eletrónico"  ng-model="formData.email"></input>
+					<input type="password" placeholder="Contraseña"  ng-model="formData.password"></input>
+					<div ng-click="login()">Iniciar sesión</div>
+					<h6>Usuario o contraseña incorrecta</h6>
+				</div>
+				<h4 ng-click="goToView('NewUser')" id="newUser">Crear cuenta</h4>
+			</center>
+		</div>
+		<!-- NEWUSER -->
+		<div ng-show="view=='NewUser'">
+			<center>
+				<div id="NewUser">
+					<h3>Nombre</h3>
+					<input type="text" placeholder="Nombre" ng-model="formData.name"></input>
+					<h3>Apellidos</h3>
+					<input type="text" placeholder="Apellidos"  ng-model="formData.second"></input>
+					<h3>Correo electrónico</h3>
+					<input type="text" placeholder="Correo electrónico" ng-model="formData.email"></input>
+					<h3>Contraseña</h3>
+					<input type="password" placeholder="Contraseña" ng-model="formData.password"></input>
+					<h3>Confirmar contraseña</h3>
+					<input type="password" placeholder="Confirmar contraseña" ng-model="formData.password2"></input>
+					<div ng-click="newUser()">Crear usuario</div>
+					<h6>Llena bien los campos</h6>
+				</div>
+			</center>
+		</div>
 
+		<!-- FOOTER -->
+		<footer>
+			<ul class="FooterMenu">
+				<li class="FooterItem" ng-click="goToView('FAQ')">FAQ</li>
+				<li class="FooterItem" ng-click="goToView('Blog')">Blog</li>
+				<li class="FooterItem" ng-click="goToView('Terms and Privacy')">Terms and Privacy</li>
+				<li class="FooterItem" ng-click="goToView('Status')">Status</li>
+				<li class="FooterItem" ng-click="goToView('Contact')">Contact</li>
+				<li class="FooterItem" ng-click="chat()">Chat</li>
+			</ul>
+			<p class="FooterCopyright">2016 Los amigos de fintech</p>
+		</footer>
+	</main>
 </body>
 </html>
